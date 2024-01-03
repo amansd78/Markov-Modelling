@@ -83,3 +83,80 @@ steadyStates(m_chain)
 
 # Place your calculations for the 25th generation ratio here
 
+
+
+
+s_space <- c('car', 'empty', 'm.cycle')
+s_space
+
+# Define the generator matrix
+g_matrix <- matrix(c(-1/8, 1/8, 0, .75*3/20, -3/20, .25*3/20, 0, 1/3, -1/3),
+                   byrow = TRUE, nrow = 3, dimnames = list(s_space, s_space))
+g_matrix
+
+# Create a CTMC object
+MC_service <- new('ctmc', states = s_space, generator = g_matrix, name = 'Service Time')
+MC_service
+plot(MC_service)
+
+# Convert generator matrix to transition matrix
+t_matrix <- generatorToTransitionMatrix(g_matrix, byrow = TRUE)
+t_matrix
+
+# Calculate expected hitting time from state i to state j
+ExpectedTime(MC_service, 2, 3)
+
+# Check if the CTMC object is irreducible
+is.CTMCirreducible(MC_service)
+
+# Check if the CTMC object is time reversible
+is.TimeReversible(MC_service)
+
+# Find the probability at time T = 2 from initial stage = 1
+probabilityatT(MC_service, 2, 1, useRCpp = TRUE)
+
+# Find the probability at time T = 8 from initial stage = 3
+probabilityatT(MC_service, 8, 3, useRCpp = TRUE)
+
+# Generate 20 random CTMC trajectories
+rctmc(20, MC_service, T = 0, include.T0 = TRUE, out.type = "df")
+
+
+
+# Define the state space for a more complex CTMC
+s_space_complex <- c('A', 'B', 'C', 'D', 'E')
+s_space_complex
+
+# Define a larger generator matrix
+g_matrix_complex <- matrix(c(-0.2, 0.1, 0.05, 0.03, 0.02,
+                             0.15, -0.25, 0.1, 0.03, 0.02,
+                             0.05, 0.1, -0.3, 0.05, 0.1,
+                             0.08, 0.12, 0.05, -0.25, 0,
+                             0.1, 0.15, 0.2, 0.1, -0.55),
+                           byrow = TRUE, nrow = 5, dimnames = list(s_space_complex, s_space_complex))
+g_matrix_complex
+
+# Create a CTMC object for the more complex CTMC
+MC_complex <- new('ctmc', states = s_space_complex, generator = g_matrix_complex, name = 'Complex CTMC')
+MC_complex
+plot(MC_complex)
+
+# Convert generator matrix to transition matrix for the complex CTMC
+t_matrix_complex <- generatorToTransitionMatrix(g_matrix_complex, byrow = TRUE)
+t_matrix_complex
+
+# Calculate expected hitting time for specific state transitions in the complex CTMC
+ExpectedTime(MC_complex, 'A', 'E')
+ExpectedTime(MC_complex, 'B', 'D')
+
+# Check if the complex CTMC object is irreducible and time reversible
+is.CTMCirreducible(MC_complex)
+is.TimeReversible(MC_complex)
+
+# Find the probability at time T = 5 from initial stage = 'C' in the complex CTMC
+probabilityatT(MC_complex, 5, 'C', useRCpp = TRUE)
+
+# Generate 30 random CTMC trajectories for the complex CTMC
+rctmc(30, MC_complex, T = 0, include.T0 = TRUE, out.type = "df")
+
+
